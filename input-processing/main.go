@@ -12,29 +12,44 @@ func main() {
 	fmt.Println("SP// Backend Developer Test - Input Processing")
 	fmt.Println()
 
+	_, err := readLargeInput(os.Stdin, "error")
+	if err != nil {
+		return
+	}
+}
+
+func readLargeInput(rd io.Reader, filterStr string) (result []string, err error) {
+
 	// Read STDIN into a new buffered reader
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(rd)
 
 	// TODO: Look for lines in the STDIN reader that contain "error" and output them.
 
-	const ERR = "error"
+	if reader == nil {
+		return
+	}
 
+	lineNum := 0
 	for {
-		readLine, isPrefix, err := reader.ReadLine()
-		if err != nil {
-			if err == io.EOF {
-				return
-			}
-		}
+		readLine, isPrefix, err1 := reader.ReadLine()
+		if err1 != nil {
+			err = err1
 
-		readLineAsStr := string(readLine)
-		if strings.Contains(readLineAsStr, ERR) {
-			fmt.Println(readLineAsStr)
-		}
-
-		if isPrefix == false {
 			return
 		}
 
+		readLineAsStr := string(readLine)
+		if strings.Contains(readLineAsStr, filterStr) {
+			fmt.Println(readLineAsStr)
+			result = append(result, readLineAsStr)
+		}
+
+		lineNum++
+
+		if isPrefix == false {
+			fmt.Printf("Totally %v number of line was read\n", lineNum)
+
+			return
+		}
 	}
 }

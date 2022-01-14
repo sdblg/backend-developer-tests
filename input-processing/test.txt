@@ -1,0 +1,4 @@
+this is test file 1 line with error string
+this is test file 2 line without ERROR string
+this is test file 3 line with ERROR string
+this is test file 4 line with ERROR string
