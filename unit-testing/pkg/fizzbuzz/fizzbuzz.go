@@ -12,7 +12,7 @@ import (
 // - Return "Buzz" if the integer is divisible by the `buzzAt` value.
 // - Return "FizzBuzz" if the integer is divisible by both the `fizzAt` and
 //   `buzzAt` values.
-// - Return the original number if is is not divisible by either the `fizzAt` or
+// - Return the original number if it is not divisible by either the `fizzAt` or
 //   the `buzzAt` values.
 func FizzBuzz(total, fizzAt, buzzAt int64) []string {
 	// Checking edge cases
