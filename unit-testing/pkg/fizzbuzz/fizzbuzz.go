@@ -1,6 +1,7 @@
 package fizzbuzz
 
 import (
+	"log"
 	"strconv"
 )
 
@@ -14,6 +15,17 @@ import (
 // - Return the original number if is is not divisible by either the `fizzAt` or
 //   the `buzzAt` values.
 func FizzBuzz(total, fizzAt, buzzAt int64) []string {
+	// Checking edge cases
+	if fizzAt == 0 || buzzAt == 0 {
+		log.Printf("WARNING: fizzAt or buzzAt should not be 0 value")
+		return []string{}
+	}
+
+	if total < 0 {
+		log.Printf("WARNING: A range of integers array should not be a negative value")
+		return []string{}
+	}
+
 	result := make([]string, total)
 
 	for i := int64(1); i <= total; i++ {
