@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/stackpath/backend-developer-tests/rest-service/pkg/api"
 )
 
 func main() {
@@ -9,4 +10,5 @@ func main() {
 	fmt.Println()
 
 	// TODO: Add RESTful web service here
+	api.InitAndRun()
 }

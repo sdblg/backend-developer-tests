@@ -1,0 +1,1 @@
+- Please import PostMan collection json file for validating the Person api service
