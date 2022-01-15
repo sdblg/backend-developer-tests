@@ -3,6 +3,10 @@ package concurrency
 import (
 	"context"
 	"errors"
+	"fmt"
+	"golang.org/x/sync/semaphore"
+	"log"
+	"sync"
 )
 
 // ErrPoolClosed is returned from AdvancedPool.Submit when the pool is closed
@@ -36,5 +40,65 @@ type AdvancedPool interface {
 // running at any one time. An error is returned if maxSlots is less than
 // maxConcurrent or if either value is not greater than zero.
 func NewAdvancedPool(maxSlots, maxConcurrent int) (AdvancedPool, error) {
-	panic("TODO")
+	ap := new(APool)
+	ap.totalSubmissionNumber = int64(maxSlots)
+	ap.sem = semaphore.NewWeighted(int64(maxConcurrent))
+	ap.wg = &sync.WaitGroup{}
+
+	return ap, nil
+
+}
+
+type APool struct {
+	isClosed bool
+	Pool
+}
+
+func (A *APool) Submit(ctx context.Context, f func(context.Context)) error {
+	if A.ctx == nil {
+		A.ctx = ctx
+	}
+
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
+	for c := int64(0); c < A.totalSubmissionNumber; c++ {
+		if err := A.sem.Acquire(A.ctx, 1); err != nil {
+			log.Printf("Failed to acquire semaphore: %v\n", err)
+
+			return err
+		}
+
+		A.wg.Add(1)
+
+		go func(f func(ctx context.Context), weighted *semaphore.Weighted, wg *sync.WaitGroup, c int64, ctx context.Context) {
+			defer func() {
+				weighted.Release(1)
+				A.wg.Done()
+				fmt.Printf("%vth work has been done\n\n", c)
+			}()
+
+			fmt.Printf("Starting %vth work has been started\n", c)
+			f(ctx)
+
+		}(f, A.sem, A.wg, c, ctx)
+	}
+
+	return nil
+}
+
+func (A *APool) Close(ctx context.Context) error {
+	if A.isClosed {
+		return ErrPoolClosed
+	}
+
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
+	A.wg.Wait()
+	A.isClosed = true
+
+	return nil
 }
